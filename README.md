@@ -7,7 +7,5 @@ Todos os campos são validados no navegador e os documentos obrigatórios precis
 
 ![Visual do formulário](Formulario-cadastro.png)
 
-## 📁 Estrutura do projeto
-
 ![Visual do formulário](Estruturadoprojeto.png)
 
