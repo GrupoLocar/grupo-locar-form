@@ -105,6 +105,7 @@ window.addEventListener('DOMContentLoaded', () => {
       document.getElementById("resposta")?.remove();
 
     } catch (err) {
+      const respostaEl = document.getElementById("resposta");
       console.error("Erro de envio:", err);
       if (respostaEl) {
         respostaEl.textContent = "Erro: " + err.message;
