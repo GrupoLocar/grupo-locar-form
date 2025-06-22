@@ -2,7 +2,6 @@
   "name": "grupo-locar-form",
   "version": "1.0.0",
   "main": "index.js",
-  "type": "module",
   "dependencies": {
     "formidable-serverless": "^1.1.0",
     "mongodb": "^5.7.0",
