@@ -7,11 +7,16 @@ Todos os campos são validados no navegador e os documentos obrigatórios precis
 
 ![Visual do formulário](Formulario-cadastro.png)
 
-## 📁 Arquivos incluídos
+## 📁 Estrutura do projeto
 
-- `index.html` – Página principal do formulário
-- `index.css` – Estilos do formulário
-- `agradecimento.html` – Página exibida após envio bem-sucedido
-- `Logotipo.png` – Logotipo institucional exibido no formulário
-- `Formulario-cadastro.png` – Captura de tela da interface do formulário
+grupo-locar-form/
+├── api/
+│   └── submit.js
+├── public/
+│   ├── index.html
+│   ├── script.js
+│   └── style.css
+├── package.json
+├── .gitignore
+└── vercel.json
 
