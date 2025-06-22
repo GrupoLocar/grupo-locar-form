@@ -9,14 +9,5 @@ Todos os campos são validados no navegador e os documentos obrigatórios precis
 
 ## 📁 Estrutura do projeto
 
-- `grupo-locar-form/`
-- `├── api/`
-- `│   └── submit.js`
-- `├── public/`
-- `│   ├── index.html`
-- `│   ├── script.js`
-- `│   └── style.css`
-- `├── package.json`
-- `├── .gitignore`
-- `└── vercel.json`
+![Visual do formulário](Estruturadoprojeto.png)
 
