@@ -74,6 +74,8 @@ window.addEventListener('DOMContentLoaded', () => {
     }
 
     try {
+      const respostaEl = document.getElementById("resposta");
+
       const res = await fetch("/api/submit", {
         method: "POST",
         body: formData
