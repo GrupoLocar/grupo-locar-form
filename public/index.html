@@ -37,6 +37,14 @@
             color: #555;
         }
 
+        .file-upload .file-name {
+            max-width: 100%;
+            overflow-wrap: break-word;
+            word-break: break-word;
+            white-space: normal;
+            box-sizing: border-box;
+        }
+
         input[type="file"] {
             display: none;
         }
@@ -76,6 +84,7 @@
 
                 <div class="file-upload">
                     <label for="cnh_arquivo"></label>
+                    <label>CNH (Carteira Nacional de Habilitação)</label>
                     <label class="custom-file-label">
                         Escolher arquivo
                         <input type="file" id="cnh_arquivo" name="cnh_arquivo" accept=".pdf,.jpg,.jpeg,.png">
@@ -86,31 +95,31 @@
                 <label for="cnh">CNH (número):
                     <input type="text" name="cnh" placeholder="CNH" data-mask="99999999999" maxlength="11" required />
 
-                <label>Categoria:
-                    <select name="categoria">
-                        <option>Selecione</option>
-                        <option>AB</option>
-                        <option>AC</option>
-                        <option>AD</option>
-                        <option>AE</option>
-                        <option>B</option>
-                        <option>C</option>
-                        <option>D</option>
-                        <option>E</option>
-                    </select>
-                </label>
-
-                <label for="validade_cnh">Data de Validade da CNH: <input type="date" id="validade_cnh"
-                        name="validade_cnh" required></label>
-                <br>
-                <div class="file-upload">
-                    <label for="comprovante_residencia">Comprovante de Residência (arquivo):</label>
-                    <label class="custom-file-label">
-                        Escolher arquivo
-                        <input type="file" id="comprovante_residencia" name="comprovante_residencia" accept=".pdf">
+                    <label>Categoria:
+                        <select name="categoria">
+                            <option>Selecione</option>
+                            <option>AB</option>
+                            <option>AC</option>
+                            <option>AD</option>
+                            <option>AE</option>
+                            <option>B</option>
+                            <option>C</option>
+                            <option>D</option>
+                            <option>E</option>
+                        </select>
                     </label>
-                    <span class="file-name">Nenhum arquivo selecionado</span>
-                </div>
+
+                    <label for="validade_cnh">Data de Validade da CNH: <input type="date" id="validade_cnh"
+                            name="validade_cnh" required></label>
+                    <br>
+                    <div class="file-upload">
+                        <label for="comprovante_residencia">Comprovante de Residência (arquivo):</label>
+                        <label class="custom-file-label">
+                            Escolher arquivo
+                            <input type="file" id="comprovante_residencia" name="comprovante_residencia" accept=".pdf">
+                        </label>
+                        <span class="file-name">Nenhum arquivo selecionado</span>
+                    </div>
             </div>
 
             <div class="formulario-wrapper">
@@ -141,54 +150,60 @@
 
             <div class="formulario-wrapper">
                 <label for="telefone">
-                <input type="text" id="telefone" name="telefone" data-mask="(99)99999-9999" placeholder="Telefone" maxlength="14" required />
-                <label for="email"><input type="email" id="email" name="email" placeholder="Email" maxlength="80"
-                        autocomplete="off" required></label>
-                <label for="endereco"><input type="text" id="endereco" name="endereco" placeholder="Endereço"
-                        maxlength="100"></label>
-                <label for="complemento"><input type="text" id="complemento" name="complemento"
-                        placeholder="Complemento" maxlength="80"></label>
-                <label for="bairro"><input type="text" id="bairro" name="bairro" placeholder="Bairro"
-                        maxlength="100"></label>
-                <label for="municipio"><input type="text" id="municipio" name="municipio" placeholder="Município"
-                        maxlength="100"></label>
-                <input type="text" id="cep" name="cep" data-mask="99.999-999" placeholder="CEP" maxlength="10" required />
-                <label for="banco"><input type="text" id="banco" name="banco" placeholder="Banco"
-                        maxlength="50"></label>
-                <label for="agencia"><input type="text" id="agencia" name="agencia" placeholder="Agência"
-                        maxlength="30"></label>
-                <label for="conta"><input type="text" id="conta" name="conta" placeholder="Conta"
-                        maxlength="30"></label>
-                <label for="pix"><input type="text" id="pix" name="pix" placeholder="Pix" maxlength="50"></label>
-                <label for="data_nascimento">Data de Nascimento</label>
-                <input type="date" id="data_nascimento" name="data_nascimento" placeholder="Data de Nascimento">
-                <label for="cpf">
-                    <input type="text" id="cpf" name="cpf" placeholder="CPF" data-mask="999.999.999-99" maxlength="14" required />
-                <label for="rg">
-                    <input type="text" id="rg" name="rg" placeholder="RG" data-mask="99.999.999-9" maxlength="12" required />
-                <label for="estado_civil">Estado Civil:</label>
-                <select id="estado_civil" name="estado_civil">
-                    <option>Selecione</option>
-                    <option>Casado(a)</option>
-                    <option>Solteiro(a)</option>
-                    <option>Separado(a)</option>
-                    <option>Divorciado(a)</option>
-                    <option>Viúvo(a)</option>
-                </select>
-                <label for="filhos">Filhos</label>
-                <input type="text" id="filhos" name="filhos" maxlength="2" placeholder="Filhos" oninput="this.value = this.value.slice(0, 2);" required />
-                <label for="nome_familiar"><input type="text" id="nome_familiar" name="nome_familiar"
-                        placeholder="Nome Familiar" maxlength="80"></label>
-                <label for="contato_familiar">
-                    <input type="text" id="contato_familiar" name="contato_familiar" placeholder="Contato Familiar" data-mask="(99)99999-9999" maxlength="14" required />
-                <label for="indicado"><input type="text" id="indicado" name="indicado" placeholder="Indicado"
-                        maxlength="80"></label>
-                <label for="observacao"><textarea id="observacao" name="observacao" placeholder="Observação"
-                        maxlength="300"></textarea></label>
-                <div class="botaoenviar-container">
-                    <button class="botaoenviar" type="submit">Enviar</button>
-                </div>
-                <footer class="footer">© Grupo Locar. Todos os direitos reservados.</footer>
+                    <input type="text" id="telefone" name="telefone" data-mask="(99)99999-9999" placeholder="Telefone"
+                        maxlength="14" required />
+                    <label for="email"><input type="email" id="email" name="email" placeholder="Email" maxlength="80"
+                            autocomplete="off" required></label>
+                    <label for="endereco"><input type="text" id="endereco" name="endereco" placeholder="Endereço"
+                            maxlength="100"></label>
+                    <label for="complemento"><input type="text" id="complemento" name="complemento"
+                            placeholder="Complemento" maxlength="80"></label>
+                    <label for="bairro"><input type="text" id="bairro" name="bairro" placeholder="Bairro"
+                            maxlength="100"></label>
+                    <label for="municipio"><input type="text" id="municipio" name="municipio" placeholder="Município"
+                            maxlength="100"></label>
+                    <input type="text" id="cep" name="cep" data-mask="99.999-999" placeholder="CEP" maxlength="10"
+                        required />
+                    <label for="banco"><input type="text" id="banco" name="banco" placeholder="Banco"
+                            maxlength="50"></label>
+                    <label for="agencia"><input type="text" id="agencia" name="agencia" placeholder="Agência"
+                            maxlength="30"></label>
+                    <label for="conta"><input type="text" id="conta" name="conta" placeholder="Conta"
+                            maxlength="30"></label>
+                    <label for="pix"><input type="text" id="pix" name="pix" placeholder="Pix" maxlength="50"></label>
+                    <label for="data_nascimento">Data de Nascimento</label>
+                    <input type="date" id="data_nascimento" name="data_nascimento" placeholder="Data de Nascimento">
+                    <label for="cpf">
+                        <input type="text" id="cpf" name="cpf" placeholder="CPF" data-mask="999.999.999-99"
+                            maxlength="14" required />
+                        <label for="rg">
+                            <input type="text" id="rg" name="rg" placeholder="RG" data-mask="99.999.999-9"
+                                maxlength="12" required />
+                            <label for="estado_civil">Estado Civil:</label>
+                            <select id="estado_civil" name="estado_civil">
+                                <option>Selecione</option>
+                                <option>Casado(a)</option>
+                                <option>Solteiro(a)</option>
+                                <option>Separado(a)</option>
+                                <option>Divorciado(a)</option>
+                                <option>Viúvo(a)</option>
+                            </select>
+                            <label for="filhos">Filhos</label>
+                            <input type="text" id="filhos" name="filhos" maxlength="2" placeholder="Filhos"
+                                oninput="this.value = this.value.slice(0, 2);" required />
+                            <label for="nome_familiar"><input type="text" id="nome_familiar" name="nome_familiar"
+                                    placeholder="Nome Familiar" maxlength="80"></label>
+                            <label for="contato_familiar">
+                                <input type="text" id="contato_familiar" name="contato_familiar"
+                                    placeholder="Contato Familiar" data-mask="(99)99999-9999" maxlength="14" required />
+                                <label for="indicado"><input type="text" id="indicado" name="indicado"
+                                        placeholder="Indicado" maxlength="80"></label>
+                                <label for="observacao"><textarea id="observacao" name="observacao"
+                                        placeholder="Observação" maxlength="300"></textarea></label>
+                                <div class="botaoenviar-container">
+                                    <button class="botaoenviar" type="submit">Enviar</button>
+                                </div>
+                                <footer class="footer">© Grupo Locar. Todos os direitos reservados.</footer>
             </div>
         </form>
 
@@ -199,4 +214,3 @@
 </body>
 
 </html>
-
