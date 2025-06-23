@@ -1,17 +1,17 @@
 # 📦 Node.js
-node_modules/      # Dependências locais, não precisam ir pro repositório
-.env               # Variáveis de ambiente
-.DS_Store          # Arquivos ocultos do macOS
+node_modules/
+.env
+.DS_Store
 
 # 🚀 Vercel
-.vercel/           # Diretório de cache e configs locais do Vercel CLI
+.vercel/
 
 # 📁 Uploads locais (evita subir arquivos salvos via formulário)
-public/uploads/    # Onde os arquivos são salvos localmente (dev)
+public/uploads/
 
 # 🔧 IDEs e editores (opcional, mas recomendado)
-.vscode/           # Configs locais do VS Code (opcional)
-*.log              # Logs de erros/executáveis
+.vscode/
+*.log
 
 # 🔧 Build outputs (se usar)
 dist/
