@@ -139,7 +139,7 @@ button {
     box-sizing: border-box;
 }
 
-/* Estilo uniforme para campos de entrada */
+/* Estilo uniforme para campos de entrada
 .formulario-wrapper input[type="text"],
 .formulario-wrapper input[type="email"],
 .formulario-wrapper input[type="date"],
@@ -147,9 +147,26 @@ button {
 .formulario-wrapper select {
     width: 200%;
     max-width: 345px;
-    /* Limita a largura máxima */
+    Limita a largura máxima
+    padding: 8px;
+    margin-bottom: 12px;
+    font-size: 16px;
+} */
+
+.formulario-wrapper input[type="text"],
+.formulario-wrapper input[type="email"],
+.formulario-wrapper input[type="date"],
+.formulario-wrapper input[type="tel"],
+.formulario-wrapper input[type="number"],
+.formulario-wrapper textarea,
+.formulario-wrapper select {
+    width: 100%;
+    max-width: 345px;
+    box-sizing: border-box;
     padding: 8px;
     margin-bottom: 12px;
     font-size: 16px;
 }
+
+
 
