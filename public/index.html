@@ -8,47 +8,6 @@
     <link rel="stylesheet" href="style.css">
     <link rel="icon" href="/favicon.ico" type="image/x-icon" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.inputmask/5.0.8/inputmask.min.js"></script>
-    <style>
-        .formulario-wrapper {
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            padding: 20px;
-            background-color: #f9f9f9;
-            margin-bottom: 20px;
-        }
-
-        .file-upload {
-            margin-bottom: 1em;
-        }
-
-        .custom-file-label {
-            background-color: #007BFF;
-            color: white;
-            padding: 8px 12px;
-            cursor: pointer;
-            border-radius: 4px;
-            display: inline-block;
-            font-size: 14px;
-        }
-
-        .file-name {
-            margin-left: 10px;
-            font-style: italic;
-            color: #555;
-        }
-
-        .file-upload .file-name {
-            max-width: 100%;
-            overflow-wrap: break-word;
-            word-break: break-word;
-            white-space: normal;
-            box-sizing: border-box;
-        }
-
-        input[type="file"] {
-            display: none;
-        }
-    </style>
 </head>
 
 <body>
@@ -77,14 +36,12 @@
             <div class="formulario-wrapper">
                 <label for="nome"><input type="text" id="nome" name="nome" placeholder="Nome Completo" maxlength="80"
                         required></label>
-                <br>
                 <p>📌 Documentos Obrigatórios:</p>
                 <p>Por favor envie o documento e preencha os campos abaixo.</p>
-                <span style="color: red;">Obrigatório para o Estado do Rio de Janeiro.</span>
 
                 <div class="file-upload">
                     <label for="cnh_arquivo"></label>
-                    <label>CNH (Carteira Nacional de Habilitação)</label>
+                    <label style="margin-top: 20px;">CNH (Carteira Nacional de Habilitação)</label>
                     <label class="custom-file-label">
                         Escolher arquivo
                         <input type="file" id="cnh_arquivo" name="cnh_arquivo" accept=".pdf,.jpg,.jpeg,.png">
@@ -126,6 +83,7 @@
                 <p>🗂️ Documentos Opcionais:</p>
                 <div class="file-upload">
                     <label for="nada_consta">Nada Consta (opcional):</label>
+                    <span style="color: red;">Obrigatório para o Estado do Rio de Janeiro.</span>
                     <label class="custom-file-label">
                         Escolher arquivo
                         <input type="file" id="nada_consta" name="nada_consta" accept=".pdf">
