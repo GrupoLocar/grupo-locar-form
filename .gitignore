@@ -1,5 +1,22 @@
-.env
-.vercel
-uploads/
-.DS_Store" > .gitignore
-node_modules/
+# 📦 Node.js
+node_modules/      # Dependências locais, não precisam ir pro repositório
+.env               # Variáveis de ambiente
+.DS_Store          # Arquivos ocultos do macOS
+
+# 🚀 Vercel
+.vercel/           # Diretório de cache e configs locais do Vercel CLI
+
+# 📁 Uploads locais (evita subir arquivos salvos via formulário)
+public/uploads/    # Onde os arquivos são salvos localmente (dev)
+
+# 🔧 IDEs e editores (opcional, mas recomendado)
+.vscode/           # Configs locais do VS Code (opcional)
+*.log              # Logs de erros/executáveis
+
+# 🔧 Build outputs (se usar)
+dist/
+build/
+
+# 📂 Outros diretórios locais (se criados para testes)
+temp/
+tmp/
