@@ -91,7 +91,7 @@ window.addEventListener('DOMContentLoaded', () => {
       // ✅ Exibir mensagem de agradecimento
       if (container) {
         container.innerHTML = `
-        <div style="text-align: center; padding: 30px; background: #f0fdf4; border-radius: 12px; box-shadow: 0 0 10px rgba(0,0,0,0.05);">
+        <div style="text-align: center; padding: 40px; background: #f0fdf4; border-radius: 12px; box-shadow: 0 0 10px rgba(0,0,0,0.05);">
           <h2 style="color: #15803d; font-size: 24px;"></h2>
         <div style="text-align: center; padding: 40px; background: #f0fdf4; border-radius: 12px; box-shadow: 0 0 10px rgba(0,0,0,0.05);">
           <h2 style="color: #15803d; font-size: 24px;">✅ Obrigado!</h2>
