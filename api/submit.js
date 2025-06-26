@@ -8,6 +8,9 @@ const { Dropbox }      = require("dropbox");
 const { MongoClient }  = require("mongodb");
 require("dotenv").config();
 
+// Use  ' * '  em Access-Control-Allow-Origin apenas para testes; em produção mantenha o domínio fixo.
+const ALLOW_ORIGIN = "https://formulario.grupolocar.com";
+
 // -----------------------------------------------------------------------------
 // Dropbox – inicialização com refresh token
 // -----------------------------------------------------------------------------
@@ -38,6 +41,11 @@ module.exports.config = { api: { bodyParser: false } };
 // Handler principal
 // -----------------------------------------------------------------------------
 module.exports.default = async function handler(req, res) {
+  // CORS headers
+  res.setHeader("Access-Control-Allow-Origin", ALLOW_ORIGIN);
+  res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+
   if (req.method !== "POST") {
     res.setHeader("Allow", ["POST"]);
     return res.status(405).end("Método não permitido");
@@ -135,4 +143,3 @@ module.exports.default = async function handler(req, res) {
     return res.status(500).json({ message: "Erro interno", error: outer });
   }
 };
-

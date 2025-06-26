@@ -76,7 +76,7 @@ window.addEventListener('DOMContentLoaded', () => {
     try {
       const respostaEl = document.getElementById("resposta");
       
-      const res = await fetch("/api/submit", {
+      const res = await fetch("https://grupo-locar-form.vercel.app/api/submit", {
         method: "POST",
         body: formData
       });
