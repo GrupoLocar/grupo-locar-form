@@ -5,6 +5,7 @@ node_modules/
 
 # 🚀 Vercel
 .vercel/
+.env.local
 
 # 📁 Uploads locais (evita subir arquivos salvos via formulário)
 public/uploads/
@@ -22,3 +23,4 @@ temp/
 tmp/
 
 .vercel
+.env*.local
