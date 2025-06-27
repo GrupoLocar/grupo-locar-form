@@ -1,4 +1,7 @@
-// script.js — Grupo Locar
+// script.js
+// -----------------------------------------------------------
+// Máscaras, validações, envio com fetch e modal “aguarde”
+// -----------------------------------------------------------
 
 function mascaraTelefone(input) {
   input.value = input.value
@@ -8,12 +11,11 @@ function mascaraTelefone(input) {
     .substring(0, 14);
 }
 
-window.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', () => {
   const form = document.getElementById('formulario');
   const container = form?.parentElement;
-  const btnEnviar = form.querySelector("button[type='submit']");
 
-  // Máscaras via Inputmask
+  // Aplica Inputmask
   document.querySelectorAll('input[data-mask]').forEach(el => {
     const mask = el.getAttribute('data-mask');
     Inputmask({ mask }).mask(el);
@@ -29,7 +31,7 @@ window.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Modal “Por favor aguarde”
+  // Modal de "aguarde"
   function showModal() {
     if (document.getElementById("aguardeModal")) return;
     const div = document.createElement("div");
@@ -56,13 +58,14 @@ window.addEventListener('DOMContentLoaded', () => {
   }
 
   function hideModal() {
-    document.getElementById("aguardeModal")?.remove();
+    const div = document.getElementById("aguardeModal");
+    if (div) div.remove();
   }
 
   form.addEventListener('submit', async e => {
     e.preventDefault();
 
-    // Validação manual de campos obrigatórios
+    // Validação manual
     const invalidos = [];
     form.querySelectorAll('input, select, textarea').forEach(el => {
       const n = el.name;
@@ -84,14 +87,12 @@ window.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    // Verificar campos com máscara
+    // Máscaras completas?
     const mascaradosIncompletos = [];
     form.querySelectorAll("input[data-mask]").forEach(el => {
       const value = el.inputmask?.unmaskedvalue?.() || "";
       const expectedLength = (el.getAttribute("data-mask") || "").replace(/[^0-9]/g, "").length;
-      if (value.length < expectedLength) {
-        mascaradosIncompletos.push(el);
-      }
+      if (value.length < expectedLength) mascaradosIncompletos.push(el);
     });
 
     if (mascaradosIncompletos.length > 0) {
@@ -100,11 +101,10 @@ window.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    // Envio dos dados
     const formData = new FormData(form);
+    const respostaEl = document.getElementById("resposta");
 
     try {
-      btnEnviar.disabled = true;
       showModal();
 
       const res = await fetch("https://grupo-locar-form.vercel.app/api/submit", {
@@ -115,32 +115,27 @@ window.addEventListener('DOMContentLoaded', () => {
       const isJson = res.headers.get("content-type")?.includes("application/json");
       const data = isJson ? await res.json() : { status: "erro", message: await res.text() };
 
-      if (!res.ok) {
-        throw new Error(data.message + (data.detalhe ? " - " + data.detalhe : ""));
-      }
+      if (!res.ok) throw new Error(data.message || "Erro inesperado");
 
-      // ✅ Agradecimento
       if (container) {
         container.innerHTML = `
-          <div style="text-align: center; padding: 40px; background: #f0fdf4; border-radius: 12px; box-shadow: 0 0 10px rgba(0,0,0,0.05);">
-            <h2 style="color: #15803d; font-size: 24px;">✅ Obrigado!</h2>
-            <p style="font-size: 18px; margin-top: 10px;">Seu formulário foi enviado com sucesso.</p>
-            <p style="color: #555;">Entraremos em contato em breve, se necessário.</p>
-            <p style="display: inline-block; margin-top: 25px; padding: 20px 20px; background-color: #15803d; color: white; text-decoration: none; border-radius: 5px;">
-              Agora você já pode fechar esta página!
-            </p>
-          </div>
-        `;
+        <div style="text-align: center; padding: 40px; background: #f0fdf4; border-radius: 12px; box-shadow: 0 0 10px rgba(0,0,0,0.05);">
+          <h2 style="color: #15803d; font-size: 24px;">✅ Obrigado!</h2>
+          <p style="font-size: 18px; margin-top: 10px;">Seu formulário foi enviado com sucesso.</p>
+          <p style="color: #555;">Entraremos em contato em breve, se necessário.</p>
+          <p style="display: inline-block; margin-top: 25px; padding: 20px 20px; background-color: #15803d; color: white; text-decoration: none; border-radius: 5px;">
+            Agora você já pode fechar esta página!
+          </p>
+        </div>`;
       }
 
-      document.getElementById("resposta")?.remove();
+      respostaEl?.remove();
     } catch (err) {
       console.error("Erro de envio:", err);
-      document.getElementById("resposta")!.textContent = "Erro: " + err.message;
+      if (respostaEl) respostaEl.textContent = "Erro: " + err.message;
       alert("❌ Erro ao enviar o formulário:\n" + err.message);
     } finally {
       hideModal();
-      btnEnviar.disabled = false;
     }
   });
 });
