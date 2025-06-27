@@ -1,5 +1,4 @@
 // script.js — Grupo Locar
-// Aplica máscaras, validação, exibe modal de “aguarde”, envia para API.
 
 function mascaraTelefone(input) {
   input.value = input.value
