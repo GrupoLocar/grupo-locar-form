@@ -3,9 +3,9 @@
 // CORS dinâmico: aceita Locaweb + produção + qualquer URL *.vercel.app (preview).
 
 const { IncomingForm } = require("formidable-serverless");
-const fs               = require("fs");
-const { Dropbox }      = require("dropbox");
-const { MongoClient }  = require("mongodb");
+const fs = require("fs");
+const { Dropbox } = require("dropbox");
+const { MongoClient } = require("mongodb");
 require("dotenv").config();
 
 // ───────────────────────────────────────────
@@ -27,9 +27,9 @@ function isOriginAllowed(origin) {
 // 2. Inicializa Dropbox (refresh token)
 // ───────────────────────────────────────────
 const dbx = new Dropbox({
-  accessToken : process.env.ACCESS_TOKEN,      // opcional
+  accessToken: process.env.ACCESS_TOKEN,      // opcional
   refreshToken: process.env.REFRESH_TOKEN,
-  clientId    : process.env.APP_KEY,
+  clientId: process.env.APP_KEY,
   clientSecret: process.env.APP_SECRET
 });
 const uploadFolder = process.env.UPLOAD_FOLDER || "/uploads";
@@ -96,25 +96,37 @@ module.exports.default = async function handler(req, res) {
       try {
         for (const campo in files) {
           const lista = Array.isArray(files[campo]) ? files[campo] : [files[campo]];
+
+          attachments[campo] = [];            // garante array
+
           await Promise.all(lista.map(async (file) => {
-            const temp   = file.filepath || file.path;
+            const temp = file.filepath || file.path;
             const dropFn = `${uploadFolder}/${Date.now()}_${file.originalFilename || file.name}`;
 
+            // 1. Faz upload
             await dbx.filesUpload({
               path: dropFn,
               contents: fs.createReadStream(temp)
             });
 
+            // 2. Obtém (ou cria) link
             let url;
             try {
               url = (await dbx.sharingCreateSharedLinkWithSettings({ path: dropFn })).result.url;
-            } catch {
-              url = (await dbx.sharingListSharedLinks({ path: dropFn, direct_only: true }))
-                      .result.links[0]?.url;
+            } catch (_) {
+              const list = await dbx.sharingListSharedLinks({ path: dropFn, direct_only: true });
+              url = list.result.links[0]?.url;
             }
 
-            if (url) attachments[campo] = url.replace("?dl=0", "?raw=1");
-            fs.unlink(temp, () => {});
+            // 3. Pelo menos um link deve existir
+            if (!url) {
+              // cria link público via endpoint “/sharing/create_shared_link_with_settings”
+              const alt = await dbx.sharingCreateSharedLinkWithSettings({ path: dropFn });
+              url = alt.result.url;
+            }
+
+            attachments[campo].push(url.replace("?dl=0", "?raw=1"));
+            fs.unlink(temp, () => { });
           }));
         }
       } catch (upErr) {
