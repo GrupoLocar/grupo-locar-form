@@ -1,6 +1,8 @@
 // /api/submit.js – Node 18 (Vercel Serverless)
+// -------------------------------------------------------------------------------
 // Recebe arquivos, envia ao Dropbox (/uploads) e grava links no MongoDB Atlas.
 // CORS dinâmico: aceita Locaweb + produção + qualquer URL *.vercel.app (preview).
+// -------------------------------------------------------------------------------
 
 const { IncomingForm } = require("formidable-serverless");
 const fs = require("fs");
