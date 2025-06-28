@@ -1,44 +1,28 @@
-// /api/submit.js – Node 18 (Vercel Serverless)
-// -------------------------------------------------------------------------------
-// Recebe arquivos, envia ao Dropbox (/uploads) e grava links no MongoDB Atlas.
-// CORS dinâmico: aceita Locaweb + produção + qualquer URL *.vercel.app (preview).
-// -------------------------------------------------------------------------------
-
 const { IncomingForm } = require("formidable-serverless");
-const fs = require("fs");
-const { Dropbox } = require("dropbox");
-const { MongoClient } = require("mongodb");
+const fs               = require("fs");
+const { Dropbox }      = require("dropbox");
+const { MongoClient }  = require("mongodb");
+const { DateTime }     = require("luxon");
 require("dotenv").config();
 
-// ───────────────────────────────────────────
-// 1. CORS – defina domínios fixos e permita previews Vercel
-// ───────────────────────────────────────────
 const ALLOWED_ORIGINS = [
-  "https://formulario.grupolocar.com",         // front ainda na Locaweb
-  "https://grupo-locar-form.vercel.app"        // produção Vercel (quando migrar)
+  "https://formulario.grupolocar.com",
+  "https://grupo-locar-form.vercel.app"
 ];
-
-function isOriginAllowed(origin) {
-  if (!origin) return false;
-  if (ALLOWED_ORIGINS.includes(origin)) return true;
-  // Libera qualquer preview *.vercel.app
-  return origin.endsWith(".vercel.app");
+function isOriginAllowed(origin = "") {
+  return (
+    ALLOWED_ORIGINS.includes(origin) ||
+    origin.endsWith(".vercel.app")
+  );
 }
 
-// ───────────────────────────────────────────
-// 2. Inicializa Dropbox (refresh token)
-// ───────────────────────────────────────────
 const dbx = new Dropbox({
-  accessToken: process.env.ACCESS_TOKEN,      // opcional
   refreshToken: process.env.REFRESH_TOKEN,
-  clientId: process.env.APP_KEY,
+  clientId    : process.env.APP_KEY,
   clientSecret: process.env.APP_SECRET
 });
 const uploadFolder = process.env.UPLOAD_FOLDER || "/uploads";
 
-// ───────────────────────────────────────────
-// 3. Conexão MongoDB (com cache)
-// ───────────────────────────────────────────
 let cachedDb;
 async function getDb() {
   if (cachedDb) return cachedDb;
@@ -48,43 +32,23 @@ async function getDb() {
   return cachedDb;
 }
 
-// Desativa body-parser padrão
 module.exports.config = { api: { bodyParser: false } };
 
-// ───────────────────────────────────────────
-// 4. Handler principal
-// ───────────────────────────────────────────
 module.exports.default = async function handler(req, res) {
-  // 4.1 → CORS
+
   const origin = req.headers.origin || "";
-  if (isOriginAllowed(origin)) {
-    res.setHeader("Access-Control-Allow-Origin", origin);
-  }
+  if (isOriginAllowed(origin)) res.setHeader("Access-Control-Allow-Origin", origin);
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
-
-  // Pré-flight
   if (req.method === "OPTIONS") return res.status(200).end();
+  if (req.method !== "POST") return res.status(405).end("Método não permitido");
 
-  if (req.method !== "POST") {
-    res.setHeader("Allow", ["POST"]);
-    return res.status(405).end("Método não permitido");
-  }
+  const form = new IncomingForm({ multiples: true, keepExtensions: true, maxFileSize: 30 * 1024 * 1024 });
 
   try {
-    const form = new IncomingForm({
-      multiples: true,
-      keepExtensions: true,
-      maxFileSize: 30 * 1024 * 1024 // 30 MB
-    });
-
     form.parse(req, async (err, fields, files) => {
-      if (err) {
-        console.error("Erro na leitura do formulário:", err);
-        return res.status(400).json({ message: "Erro no formulário", err });
-      }
+      if (err) return res.status(400).json({ message: "Erro no formulário", err });
 
-      // 4.2 → Garante access-token válido
       try {
         await dbx.auth.checkAndRefreshAccessToken();
       } catch (authErr) {
@@ -93,25 +57,17 @@ module.exports.default = async function handler(req, res) {
       }
 
       const attachments = {};
-
-      // 4.3 → Upload paralelo
       try {
         for (const campo in files) {
           const lista = Array.isArray(files[campo]) ? files[campo] : [files[campo]];
-
-          attachments[campo] = [];            // garante array
+          attachments[campo] = [];
 
           await Promise.all(lista.map(async (file) => {
-            const temp = file.filepath || file.path;
+            const temp   = file.filepath || file.path;
             const dropFn = `${uploadFolder}/${Date.now()}_${file.originalFilename || file.name}`;
 
-            // 1. Faz upload
-            await dbx.filesUpload({
-              path: dropFn,
-              contents: fs.createReadStream(temp)
-            });
+            await dbx.filesUpload({ path: dropFn, contents: fs.createReadStream(temp) });
 
-            // 2. Obtém (ou cria) link
             let url;
             try {
               url = (await dbx.sharingCreateSharedLinkWithSettings({ path: dropFn })).result.url;
@@ -119,16 +75,10 @@ module.exports.default = async function handler(req, res) {
               const list = await dbx.sharingListSharedLinks({ path: dropFn, direct_only: true });
               url = list.result.links[0]?.url;
             }
-
-            // 3. Pelo menos um link deve existir
-            if (!url) {
-              // cria link público via endpoint “/sharing/create_shared_link_with_settings”
-              const alt = await dbx.sharingCreateSharedLinkWithSettings({ path: dropFn });
-              url = alt.result.url;
-            }
+            if (!url) url = (await dbx.sharingCreateSharedLinkWithSettings({ path: dropFn })).result.url;
 
             attachments[campo].push(url.replace("?dl=0", "?raw=1"));
-            fs.unlink(temp, () => { });
+            fs.unlink(temp, () => {});
           }));
         }
       } catch (upErr) {
@@ -136,7 +86,6 @@ module.exports.default = async function handler(req, res) {
         return res.status(500).json({ message: "Falha no upload", error: upErr });
       }
 
-      // 4.4 → Converte datas (opcional)
       ["validade_cnh", "data_nascimento"].forEach(k => {
         if (fields[k]) {
           const d = new Date(fields[k]);
@@ -144,23 +93,24 @@ module.exports.default = async function handler(req, res) {
         }
       });
 
-      // 4.5 → Grava no Mongo
       try {
         const db = await getDb();
         await db.collection("funcionarios").insertOne({
           ...fields,
           arquivos: attachments,
-          data_envio: new Date()
+          data_envio_utc  : new Date(),
+          data_envio_local: DateTime.now().setZone("America/Sao_Paulo")
+                                    .toFormat("yyyy-LL-dd HH:mm:ss")
         });
       } catch (mongoErr) {
         console.error("Erro Mongo:", mongoErr);
         return res.status(500).json({ message: "Falha ao gravar", error: mongoErr });
       }
 
-      return res.status(200).json({ status: "ok", links: attachments });
+      res.status(200).json({ status: "ok", links: attachments });
     });
-  } catch (outer) {
-    console.error("Erro inesperado:", outer);
-    return res.status(500).json({ message: "Erro interno", error: outer });
+  } catch (outerErr) {
+    console.error("Erro inesperado:", outerErr);
+    res.status(500).json({ message: "Erro interno", error: outerErr });
   }
 };
