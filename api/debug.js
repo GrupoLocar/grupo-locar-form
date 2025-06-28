@@ -19,7 +19,7 @@ module.exports = (req, res) => {
       status: "ok",
       ambiente: env,
       arquivosEmPublic: arquivosPublicos,
-      timestamp: new Date().toISOString()
+    timestamp: DateTime.now().setZone("America/Sao_Paulo").toFormat("yyyy-LL-dd HH:mm:ss")
     });
   } catch (error) {
     res.status(500).json({
