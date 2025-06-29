@@ -3,6 +3,35 @@
 // Máscaras, validações, envio com fetch e modal “aguarde”
 // -----------------------------------------------------------
 
+// === Funções de data ===
+
+function formatDateInput(valor) {
+  if (!valor) return '';
+
+  let d;
+
+  if (/^\d{2}\/\d{2}\/\d{4}$/.test(valor)) {
+    // dd/mm/yyyy
+    const [dia, mes, ano] = valor.split('/');
+    d = new Date(`${ano}-${mes}-${dia}T00:00:00`);
+  } else if (/^\d{4}-\d{2}-\d{2}$/.test(valor)) {
+    // yyyy-mm-dd (input type="date")
+    d = new Date(`${valor}T00:00:00`);
+  } else {
+    d = new Date(valor);
+  }
+
+  if (Number.isNaN(d.getTime())) return '';
+  return d.toISOString().slice(0, 10); // yyyy-MM-dd
+}
+
+function formatDateISO(valor) {
+  const normalizado = formatDateInput(valor);
+  return normalizado ? `${normalizado}T00:00:00.000Z` : null;
+}
+
+// -----------------------------------------------------------
+
 function mascaraTelefone(input) {
   input.value = input.value
     .replace(/\D/g, '')
@@ -87,7 +116,7 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    // Máscaras completas?
+    // Máscaras completas
     const mascaradosIncompletos = [];
     form.querySelectorAll("input[data-mask]").forEach(el => {
       const value = el.inputmask?.unmaskedvalue?.() || "";
@@ -101,18 +130,11 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    /* ----------------- ajuste de dataValidadeCNH ----------------- */
-    const campoData = form.querySelector('#dataValidadeCNH');
-    if (campoData && campoData.value) {
-      // Se vier só a data, acrescenta 'T00:00'
-      let raw = campoData.value.trim();              // 2026-01-01  ou  2026-01-01T15:11
-      if (!raw.includes('T')) raw += 'T00:00';
-
-      // Converte para ISO completo com fuso horário Z
-      const iso = new Date(raw).toISOString();       // 2026-01-01T15:11:00.000Z
-
-      // Grava de volta no input para que FormData use o ISO
-      campoData.value = iso;
+    // ✅ CONVERSÃO DE dataValidadeCNH PARA ISO COM .000Z
+    const campoDataValidade = form.querySelector('#dataValidadeCNH');
+    if (campoDataValidade && campoDataValidade.value) {
+      const iso = formatDateISO(campoDataValidade.value);
+      if (iso) campoDataValidade.value = iso;
     }
 
     const formData = new FormData(form);
