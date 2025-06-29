@@ -96,9 +96,16 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     if (mascaradosIncompletos.length > 0) {
-      alert("Por favor, preencha corretamente todos os campos com máscara.");
+      alert("Por favor, preencha corretamente todos os campos obrigatórios.");
       mascaradosIncompletos[0].focus();
       return;
+    }
+
+    /* ----------------- ajuste de dataValidadeCNH ----------------- */
+    const raw = form.querySelector('#dataValidadeCNH')?.value; // ex.: 2025-06-29T15:11
+    if (raw) {
+      const formatoBanco = raw.replace('T', ' ') + ':00';       // 2025-06-29 15:11:00
+      form.querySelector('#dataValidadeCNH').value = formatoBanco;
     }
 
     const formData = new FormData(form);
