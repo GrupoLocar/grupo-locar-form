@@ -3,34 +3,30 @@
 // Máscaras, validações, envio com fetch e modal “aguarde”
 // -----------------------------------------------------------
 
-// === Funções de data ===
+// === Helpers de data =======================================
+function formatDateInput(valor = '') {
+  if (!valor) return '';
+  let d;
 
-// function formatDateInput(valor) {
-//   if (!valor) return '';
+  if (/^\d{2}\/\d{2}\/\d{4}$/.test(valor)) {
+    // dd/MM/yyyy
+    const [dia, mes, ano] = valor.split('/');
+    d = new Date(`${ano}-${mes}-${dia}T00:00:00`);
+  } else if (/^\d{4}-\d{2}-\d{2}$/.test(valor)) {
+    // yyyy-MM-dd (padrão do <input type="date">)
+    d = new Date(`${valor}T00:00:00`);
+  } else {
+    d = new Date(valor);
+  }
 
-//   let d;
-
-//   if (/^\d{2}\/\d{2}\/\d{4}$/.test(valor)) {
-//     // dd/mm/yyyy
-//     const [dia, mes, ano] = valor.split('/');
-//     d = new Date(`${ano}-${mes}-${dia}T00:00:00`);
-//   } else if (/^\d{4}-\d{2}-\d{2}$/.test(valor)) {
-//     // yyyy-mm-dd (input type="date")
-//     d = new Date(`${valor}T00:00:00`);
-//   } else {
-//     d = new Date(valor);
-//   }
-
-//   if (Number.isNaN(d.getTime())) return '';
-//   return d.toISOString().slice(0, 10); // yyyy-MM-dd
-// }
-
-// function formatDateISO(valor) {
-//   const normalizado = formatDateInput(valor);
-//   return normalizado ? `${normalizado}T00:00:00.000Z` : null;
-// }
-
-// -----------------------------------------------------------
+  if (Number.isNaN(d.getTime())) return '';
+  return d.toISOString().slice(0, 10); // yyyy-MM-dd
+}
+function formatDateISO(valor = '') {
+  const normalizado = formatDateInput(valor);       // garante yyyy-MM-dd
+  return normalizado ? `${normalizado}T00:00:00.000Z` : null;
+}
+// ===========================================================
 
 function mascaraTelefone(input) {
   input.value = input.value
@@ -130,12 +126,16 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    // ✅ CONVERSÃO DE dataValidadeCNH PARA ISO COM .000Z
-    // const campoDataValidade = form.querySelector('#dataValidadeCNH');
-    // if (campoDataValidade && campoDataValidade.value) {
-    //   const iso = formatDateISO(campoDataValidade.value);
-    //   if (iso) campoDataValidade.value = iso;
-    // }
+    /* ------- CONVERSÃO DOS CAMPOS DE DATA ------- */
+    const convISO = (id) => {
+      const el = form.querySelector('#' + id);
+      if (el && el.value) {
+        const iso = formatDateISO(el.value);
+        if (iso) el.value = iso;
+      }
+    };
+    convISO('dataValidadeCNH');
+    convISO('data_nascimento');
 
     const formData = new FormData(form);
     const respostaEl = document.getElementById("resposta");

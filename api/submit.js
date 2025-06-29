@@ -1,8 +1,8 @@
 const { IncomingForm } = require("formidable-serverless");
-const fs               = require("fs");
-const { Dropbox }      = require("dropbox");
-const { MongoClient }  = require("mongodb");
-const { DateTime }     = require("luxon");
+const fs = require("fs");
+const { Dropbox } = require("dropbox");
+const { MongoClient } = require("mongodb");
+const { DateTime } = require("luxon");
 require("dotenv").config();
 
 const ALLOWED_ORIGINS = [
@@ -18,7 +18,7 @@ function isOriginAllowed(origin = "") {
 
 const dbx = new Dropbox({
   refreshToken: process.env.REFRESH_TOKEN,
-  clientId    : process.env.APP_KEY,
+  clientId: process.env.APP_KEY,
   clientSecret: process.env.APP_SECRET
 });
 const uploadFolder = process.env.UPLOAD_FOLDER || "/uploads";
@@ -33,6 +33,15 @@ async function getDb() {
 }
 
 module.exports.config = { api: { bodyParser: false } };
+
+/* --------- ajuste de datas antes de salvar --------- */
+function coerceToDate(fields, chave) {
+  if (!fields[chave]) return;
+  if (fields[chave] instanceof Date) return;            // já é Date
+
+  const d = new Date(fields[chave]);
+  if (!isNaN(d)) fields[chave] = d;                     // string -> Date
+}
 
 module.exports.default = async function handler(req, res) {
 
@@ -63,7 +72,7 @@ module.exports.default = async function handler(req, res) {
           attachments[campo] = [];
 
           await Promise.all(lista.map(async (file) => {
-            const temp   = file.filepath || file.path;
+            const temp = file.filepath || file.path;
             const dropFn = `${uploadFolder}/${Date.now()}_${file.originalFilename || file.name}`;
 
             await dbx.filesUpload({ path: dropFn, contents: fs.createReadStream(temp) });
@@ -78,7 +87,7 @@ module.exports.default = async function handler(req, res) {
             if (!url) url = (await dbx.sharingCreateSharedLinkWithSettings({ path: dropFn })).result.url;
 
             attachments[campo].push(url.replace("?dl=0", "?raw=1"));
-            fs.unlink(temp, () => {});
+            fs.unlink(temp, () => { });
           }));
         }
       } catch (upErr) {
@@ -93,14 +102,19 @@ module.exports.default = async function handler(req, res) {
         }
       });
 
+      // --- converte todos os possíveis nomes de campo ---
+      ["dataValidadeCNH", "validade_cnh", "data_nascimento"].forEach(k =>
+        coerceToDate(fields, k)
+      );
+
       try {
         const db = await getDb();
         await db.collection("funcionarios").insertOne({
           ...fields,
           arquivos: attachments,
-          data_envio_utc  : new Date(),
+          data_envio_utc: new Date(),
           data_envio_local: DateTime.now().setZone("America/Sao_Paulo")
-                                    .toFormat("yyyy-LL-dd HH:mm:ss")
+            .toFormat("yyyy-LL-dd HH:mm:ss")
         });
       } catch (mongoErr) {
         console.error("Erro Mongo:", mongoErr);
