@@ -126,18 +126,17 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    /* ------- CONVERSÃO DOS CAMPOS DE DATA ------- */
-    const convISO = (id) => {
-      const el = form.querySelector('#' + id);
-      if (el && el.value) {
-        const iso = formatDateISO(el.value);
-        if (iso) el.value = iso;
-      }
-    };
-    convISO('dataValidadeCNH');
-    convISO('data_nascimento');
-
+    /* ------- FORMDATA COM DATAS EM ISO ------- */
     const formData = new FormData(form);
+
+    const toISO = (fieldName) => {
+      const v = formData.get(fieldName);   // yyyy-MM-dd
+      if (v) formData.set(fieldName, formatDateISO(v)); // yyyy-MM-ddT00:00:00.000Z
+    };
+    toISO('dataValidadeCNH');
+    toISO('data_nascimento');
+    toISO('data_admissao');
+    toISO('dataUltimoServicoPrestado');
     const respostaEl = document.getElementById("resposta");
 
     try {
