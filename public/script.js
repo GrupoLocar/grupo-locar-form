@@ -102,10 +102,17 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     /* ----------------- ajuste de dataValidadeCNH ----------------- */
-    const raw = form.querySelector('#dataValidadeCNH')?.value; // ex.: 2025-06-29T15:11
-    if (raw) {
-      const formatoBanco = raw.replace('T', ' ') + ':00';       // 2025-06-29 15:11:00
-      form.querySelector('#dataValidadeCNH').value = formatoBanco;
+    const campoData = form.querySelector('#dataValidadeCNH');
+    if (campoData && campoData.value) {
+      // Se vier só a data, acrescenta 'T00:00'
+      let raw = campoData.value.trim();              // 2026-01-01  ou  2026-01-01T15:11
+      if (!raw.includes('T')) raw += 'T00:00';
+
+      // Converte para ISO completo com fuso horário Z
+      const iso = new Date(raw).toISOString();       // 2026-01-01T15:11:00.000Z
+
+      // Grava de volta no input para que FormData use o ISO
+      campoData.value = iso;
     }
 
     const formData = new FormData(form);
