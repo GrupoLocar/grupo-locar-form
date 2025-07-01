@@ -1,4 +1,4 @@
-// script.js
+// C:\grupo-locar-form\public\script.js
 // -----------------------------------------------------------
 // Máscaras, validações, envio com fetch e modal “aguarde”
 // -----------------------------------------------------------
