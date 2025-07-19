@@ -31,6 +31,19 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
+  // Funções de normalização
+  function formatarNomeEndereco(valor) {
+    return valor
+      .toLowerCase()
+      .replace(/\s+/g, ' ')
+      .trim()
+      .replace(/\b\w/g, letra => letra.toUpperCase());
+  }
+
+  function validarEmail(valor) {
+    return valor.toLowerCase();
+  }
+
   // Modal de "aguarde"
   function showModal() {
     if (document.getElementById("aguardeModal")) return;
@@ -99,6 +112,28 @@ document.addEventListener('DOMContentLoaded', () => {
       alert("Por favor, preencha corretamente todos os campos com máscara.");
       mascaradosIncompletos[0].focus();
       return;
+    }
+
+    // Normalização e validação personalizada
+    const nomeInput = form.querySelector('input[name="nome"]');
+    const enderecoInput = form.querySelector('input[name="endereco"]');
+    const emailInput = form.querySelector('input[name="email"]');
+
+    if (nomeInput) {
+      nomeInput.value = formatarNomeEndereco(nomeInput.value);
+    }
+
+    if (enderecoInput) {
+      enderecoInput.value = formatarNomeEndereco(enderecoInput.value);
+    }
+
+    if (emailInput) {
+      emailInput.value = validarEmail(emailInput.value);
+      if (!emailInput.value.includes('@')) {
+        alert('O e-mail deve conter o caractere @');
+        emailInput.focus();
+        return;
+      }
     }
 
     const formData = new FormData(form);

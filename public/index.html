@@ -99,6 +99,15 @@
                     </label>
                     <span class="file-name">Nenhum arquivo selecionado</span>
                 </div>
+
+                <div class="file-upload">
+                    <label for="curriculo">Currículo (opcional):</label>
+                    <label class="custom-file-label">
+                        Escolher arquivo
+                        <input type="file" id="curriculo" name="curriculo" accept=".pdf">
+                    </label>
+                    <span class="file-name">Nenhum arquivo selecionado</span>
+                </div>
             </div>
 
             <input type="hidden" name="situacao" value="Aprovar">
@@ -112,6 +121,14 @@
                         maxlength="14" required />
                     <label for="email"><input type="email" id="email" name="email" placeholder="Email" maxlength="80"
                             autocomplete="off" required></label>
+                    <label for="sexo">Sexo:</label>
+                    <select id="sexo" name="sexo">
+                        <option>Selecione</option>
+                        <option>Masculino</option>
+                        <option>Feminino</option>
+                    </select>
+                    <label for="profissao"><input type="text" id="profissao" name="profissao" placeholder="Profissão"
+                            maxlength="100"></label>
                     <label for="endereco"><input type="text" id="endereco" name="endereco" placeholder="Endereço"
                             maxlength="100"></label>
                     <label for="complemento"><input type="text" id="complemento" name="complemento"

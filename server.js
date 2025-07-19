@@ -1,15 +1,38 @@
-require('dotenv').config();
+const fs = require('fs');
+const path = require('path');
+
+const envPath = path.resolve(__dirname, '.env');
+console.log('🧪 Verificando .env em:', envPath);
+if (!fs.existsSync(envPath)) {
+  console.error('❌ Arquivo .env NÃO encontrado no caminho:', envPath);
+  process.exit(1);
+}
+
+require('dotenv').config({ path: path.resolve(__dirname, '.env') });
+console.log('MONGO_URI:', process.env.MONGO_URI);
+
 const express = require('express');
 const multer = require('multer');
 const { Dropbox } = require('dropbox');
 const mongoose = require('mongoose');
-const fs = require('fs');
-const path = require('path');
 
 const app = express();
 const upload = multer({ dest: 'temp/' });
 
-mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true });
+if (!process.env.MONGO_URI) {
+  console.error('❌ Erro: MONGO_URI não encontrado no arquivo .env');
+  process.exit(1);
+}
+
+mongoose.connect(process.env.MONGO_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+})
+.then(() => console.log('✅ Conectado ao MongoDB'))
+.catch(err => {
+  console.error('❌ Erro ao conectar no MongoDB:', err.message);
+  process.exit(1);
+});
 
 const FuncionarioSchema = new mongoose.Schema({
   nome: String,
@@ -17,6 +40,11 @@ const FuncionarioSchema = new mongoose.Schema({
   arquivos: [String],
 });
 const Funcionario = mongoose.model('Funcionario', FuncionarioSchema);
+
+if (!process.env.ACCESS_TOKEN) {
+  console.error('❌ Erro: ACCESS_TOKEN não encontrado no arquivo .env');
+  process.exit(1);
+}
 
 const dbx = new Dropbox({ accessToken: process.env.ACCESS_TOKEN });
 
@@ -37,14 +65,21 @@ app.post('/upload', upload.array('arquivos'), async (req, res) => {
     } catch (err) {
       return res.status(500).json({ message: 'Erro ao enviar para Dropbox', error: err });
     } finally {
-      fs.unlinkSync(file.path); // remove arquivo temporário
+      fs.unlinkSync(file.path);
     }
   }
 
-  const novoFuncionario = new Funcionario({ nome, email, arquivos: links });
-  await novoFuncionario.save();
-
-  res.json({ message: 'Enviado com sucesso!', links });
+  try {
+    const novoFuncionario = new Funcionario({ nome, email, arquivos: links });
+    await novoFuncionario.save();
+    res.json({ message: 'Enviado com sucesso!', links });
+  } catch (err) {
+    res.status(500).json({ message: 'Erro ao salvar no banco de dados', error: err });
+  }
 });
 
-app.listen(3000, () => console.log('Servidor rodando na porta 3000'));
+app.get('/', (req, res) => {
+  res.send('🚀 API Formulário de Cadastro está online!');
+});
+
+app.listen(3000, () => console.log('🚀 Servidor rodando na porta 3000'));
