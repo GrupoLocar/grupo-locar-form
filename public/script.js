@@ -82,11 +82,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const invalidos = [];
     form.querySelectorAll('input, select, textarea').forEach(el => {
       const n = el.name;
+      const tipo = el.type;
+
+      // Ignora campos opcionais
       if (
-        n === 'observacao' || el.type === 'hidden' ||
-        n === 'nada_consta' || n === 'comprovante_mei' || n === 'curriculo'
+        tipo === 'hidden' ||
+        ['nada_consta', 'comprovante_mei', 'curriculo', 'observacao'].includes(n)
       ) return;
 
+      // Verifica campos <select> que estejam ainda como "Selecione"
       if (el.tagName === 'SELECT' && (!el.value || el.value === 'Selecione')) {
         invalidos.push(el);
       } else if (!el.value.trim()) {
@@ -95,7 +99,12 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     if (invalidos.length) {
-      alert('Por favor, preencha todos os campos obrigatórios.');
+      const nomes = invalidos.map(el => {
+        const label = form.querySelector(`label[for="${el.id}"]`);
+        return label?.textContent?.trim() || el.placeholder || el.name;
+      });
+
+      alert('Por favor, preencha todos os campos obrigatórios:\n- ' + nomes.join('\n- '));
       invalidos[0].focus();
       return;
     }
