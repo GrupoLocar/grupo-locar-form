@@ -84,7 +84,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const n = el.name;
       if (
         n === 'observacao' || el.type === 'hidden' ||
-        n === 'nada_consta' || n === 'comprovante_mei'
+        n === 'nada_consta' || n === 'comprovante_mei' || n === 'curriculo'
       ) return;
 
       if (el.tagName === 'SELECT' && (!el.value || el.value === 'Selecione')) {
