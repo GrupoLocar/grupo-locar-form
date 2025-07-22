@@ -2,7 +2,6 @@
 // -----------------------------------------------------------
 // Máscaras, validações, envio com fetch e modal “aguarde”
 // -----------------------------------------------------------
-
 function mascaraTelefone(input) {
   input.value = input.value
     .replace(/\D/g, '')
@@ -93,7 +92,7 @@ document.addEventListener('DOMContentLoaded', () => {
       // Verifica campos <select> que estejam ainda como "Selecione"
       if (el.tagName === 'SELECT' && (!el.value || el.value === 'Selecione')) {
         invalidos.push(el);
-      } else if (!el.value.trim()) {
+      } else if (el.type !== 'file' && !el.value.trim()) {
         invalidos.push(el);
       }
     });
