@@ -61,7 +61,7 @@ module.exports.default = async function handler(req, res) {
         return res.status(500).json({ message: "Auth error", error: authErr });
       }
 
-      // Função para capitalizar textos
+      // Função para capitalizar textos maiúsculos por minúsculo
       function formatarTexto(str = "") {
         return str
           .toLowerCase()
