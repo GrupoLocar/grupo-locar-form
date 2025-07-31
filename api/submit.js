@@ -132,7 +132,7 @@ module.exports.default = async function handler(req, res) {
       }
 
       // Conversão de datas
-      ["validade_cnh", "data_nascimento"].forEach(k => {
+      ["validade_cnh", "data_nascimento", "emissao_cnh"].forEach(k => {
         if (fields[k]) {
           const d = new Date(fields[k]);
           if (!isNaN(d)) fields[k] = d;
