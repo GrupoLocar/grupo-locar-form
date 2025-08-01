@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // Formatação dinâmica de todos os campos de texto
-  // (exceto campos que devem aceitar apenas números ou devem ficar em minúsculo)
+  // (exceto campos que devem aceitar apenas números ou minúsculo)
   document.querySelectorAll('input[type="text"]').forEach(input => {
     const name = input.name;
     const skip = [
@@ -50,8 +50,9 @@ document.addEventListener('DOMContentLoaded', () => {
     input.addEventListener('input', () => {
       input.value = input.value
         .toLowerCase()
-        .replace(/\s+/g, ' ')
-        .trim()
+        // mantém espaços simples, só reduz espaços consecutivos
+        .replace(/\s{2,}/g, ' ')
+        // capitaliza a primeira letra de cada palavra
         .replace(/\b\w/g, l => l.toUpperCase());
     });
   });
