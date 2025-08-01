@@ -197,8 +197,10 @@
                                 <option>Divorciado(a)</option>
                                 <option>Viúvo(a)</option>
                             </select>
-                            <input style="margin-top: 10px;" type="text" id="filhos" name="filhos" maxlength="2"
-                                placeholder="Filhos" oninput="this.value = this.value.slice(0, 2);" required />
+
+                            <input style="margin-top: 10px;" type="number" id="filhos" name="filhos" maxlength="1"
+                                placeholder="Filhos" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 1);" required />
+
                             <label for="nome_familiar"><input type="text" id="nome_familiar" name="nome_familiar"
                                     placeholder="Nome Familiar" maxlength="80"></label>
                             <label for="contato_familiar">
