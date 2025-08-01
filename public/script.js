@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // Formatação dinâmica de todos os campos de texto
-  // (exceto campos que devem aceitar apenas números ou minúsculo)
+  // (exceto campos que devem aceitar só números ou só minúsculo)
   document.querySelectorAll('input[type="text"]').forEach(input => {
     const name = input.name;
     const skip = [
@@ -50,10 +50,10 @@ document.addEventListener('DOMContentLoaded', () => {
     input.addEventListener('input', () => {
       input.value = input.value
         .toLowerCase()
-        // mantém espaços simples, só reduz espaços consecutivos
+        // reduz múltiplos espaços a um só, sem remover espaços válidos
         .replace(/\s{2,}/g, ' ')
-        // capitaliza a primeira letra de cada palavra
-        .replace(/\b\w/g, l => l.toUpperCase());
+        // só capitaliza letra que vier no início ou após espaço
+        .replace(/(^|\s)(\p{L})/gu, (match, sep, char) => sep + char.toUpperCase());
     });
   });
 
@@ -63,7 +63,7 @@ document.addEventListener('DOMContentLoaded', () => {
       .toLowerCase()
       .replace(/\s+/g, ' ')
       .trim()
-      .replace(/\b\w/g, letra => letra.toUpperCase());
+      .replace(/(^|\s)(\p{L})/gu, (m, sep, c) => sep + c.toUpperCase());
   }
 
   function validarEmail(valor) {
@@ -104,7 +104,7 @@ document.addEventListener('DOMContentLoaded', () => {
   form.addEventListener('submit', async e => {
     e.preventDefault();
 
-    // Validação manual
+    // Validação manual de campos obrigatórios
     const invalidos = [];
     form.querySelectorAll('input, select, textarea').forEach(el => {
       const n = el.name;
@@ -113,14 +113,24 @@ document.addEventListener('DOMContentLoaded', () => {
       // Ignora campos opcionais
       if (
         tipo === 'hidden' ||
-        ['nada_consta', 'comprovante_mei', 'curriculo', 'observacao'].includes(n)
+        ['nada_consta', 'comprovante_mei', 'observacao'].includes(n)
       ) return;
 
-      // Verifica selects
+      // <select> que ainda esteja em "Selecione"
       if (el.tagName === 'SELECT' && (!el.value || el.value === 'Selecione')) {
         invalidos.push(el);
-      } else if (el.type !== 'file' && !el.value.trim()) {
+      }
+      // campos não-file sem valor
+      else if (el.type !== 'file' && !el.value.trim()) {
         invalidos.push(el);
+      }
+    });
+
+    // Validação de anexos obrigatórios
+    ['cnh_arquivo', 'comprovante_residencia', 'curriculo'].forEach(name => {
+      const fileInput = form.querySelector(`input[name="${name}"]`);
+      if (fileInput && fileInput.files.length === 0) {
+        invalidos.push(fileInput);
       }
     });
 
@@ -129,27 +139,25 @@ document.addEventListener('DOMContentLoaded', () => {
         const label = form.querySelector(`label[for="${el.id}"]`);
         return label?.textContent?.trim() || el.placeholder || el.name;
       });
-
       alert('Por favor, preencha todos os campos obrigatórios:\n- ' + nomes.join('\n- '));
       invalidos[0].focus();
       return;
     }
 
-    // Máscaras completas?
+    // Verifica máscaras completas
     const mascaradosIncompletos = [];
     form.querySelectorAll("input[data-mask]").forEach(el => {
       const value = el.inputmask?.unmaskedvalue?.() || "";
       const expectedLength = (el.getAttribute("data-mask") || "").replace(/[^0-9]/g, "").length;
       if (value.length < expectedLength) mascaradosIncompletos.push(el);
     });
-
-    if (mascaradosIncompletos.length > 0) {
+    if (mascaradosIncompletos.length) {
       alert("Por favor, preencha corretamente todos os campos com máscara.");
       mascaradosIncompletos[0].focus();
       return;
     }
 
-    // Normalização e validação personalizada antes do envio
+    // Normalização antes do envio
     const nomeInput = form.querySelector('input[name="nome"]');
     const enderecoInput = form.querySelector('input[name="endereco"]');
     const emailInput = form.querySelector('input[name="email"]');
@@ -157,11 +165,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (nomeInput) {
       nomeInput.value = formatarNomeEndereco(nomeInput.value);
     }
-
     if (enderecoInput) {
       enderecoInput.value = formatarNomeEndereco(enderecoInput.value);
     }
-
     if (emailInput) {
       emailInput.value = validarEmail(emailInput.value);
       if (!emailInput.value.includes('@')) {
@@ -171,37 +177,30 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
 
+    // Envio via fetch
     const formData = new FormData(form);
     const respostaEl = document.getElementById("resposta");
-
     try {
       showModal();
-
       const res = await fetch("https://grupo-locar-form.vercel.app/api/submit", {
         method: "POST",
         body: formData
       });
-
       const isJson = res.headers.get("content-type")?.includes("application/json");
       const data = isJson ? await res.json() : { status: "erro", message: await res.text() };
-
       if (!res.ok) throw new Error(data.message || "Erro inesperado");
 
       if (container) {
         container.innerHTML = `
-        <div style="text-align: center; margin-top: 80px; padding: 40px; background: #f0fdf4; border-radius: 12px; box-shadow: 0 0 10px rgba(0,0,0,0.05);">
-          <h2 style="color: #15803d; margin-top: 20px; font-size: 24px;">✅ Obrigado!</h2>
-          <p style="font-size: 18px; margin-top: 60px;">Seu formulário foi enviado com sucesso.</p>
-          <p style="color: #555; margin-top: 40px;">Entraremos em contato em breve, se necessário.</p>
-          <p style="display: inline-block; margin-top: 40px; margin-bottom: 40px; padding: 20px 20px; background-color: #15803d; color: white; text-decoration: none; border-radius: 5px;">
-            Agora você já pode fechar esta página!
-          </p>
-        </div>
-        <div style="text-align: center; margin-top: 40px; padding: 40px;">          
-        </div>
-        `;
+          <div style="text-align:center; margin-top:80px; padding:40px; background:#f0fdf4; border-radius:12px; box-shadow:0 0 10px rgba(0,0,0,0.05);">
+            <h2 style="color:#15803d; font-size:24px;">✅ Obrigado!</h2>
+            <p style="font-size:18px; margin-top:60px;">Seu formulário foi enviado com sucesso.</p>
+            <p style="color:#555; margin-top:40px;">Entraremos em contato em breve, se necessário.</p>
+            <p style="display:inline-block; margin:40px 0; padding:20px; background:#15803d; color:white; border-radius:5px;">
+              Agora você já pode fechar esta página!
+            </p>
+          </div>`;
       }
-
       respostaEl?.remove();
     } catch (err) {
       console.error("Erro de envio:", err);
