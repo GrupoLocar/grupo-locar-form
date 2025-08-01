@@ -30,7 +30,20 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Funções de normalização
+  // Formatação dinâmica de todos os campos de texto (exceto filhos, email e pix)
+  document.querySelectorAll('input[type="text"]').forEach(input => {
+    const nome = input.name;
+    if (nome === 'filhos' || nome === 'email' || nome === 'pix') return;
+    input.addEventListener('input', () => {
+      input.value = input.value
+        .toLowerCase()
+        .replace(/\s+/g, ' ')
+        .trim()
+        .replace(/\b\w/g, l => l.toUpperCase());
+    });
+  });
+
+  // Funções de normalização para submit
   function formatarNomeEndereco(valor) {
     return valor
       .toLowerCase()
@@ -89,7 +102,7 @@ document.addEventListener('DOMContentLoaded', () => {
         ['nada_consta', 'comprovante_mei', 'curriculo', 'observacao'].includes(n)
       ) return;
 
-      // Verifica campos <select> que estejam ainda como "Selecione"
+      // Verifica selects
       if (el.tagName === 'SELECT' && (!el.value || el.value === 'Selecione')) {
         invalidos.push(el);
       } else if (el.type !== 'file' && !el.value.trim()) {
@@ -122,7 +135,7 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    // Normalização e validação personalizada
+    // Normalização e validação personalizada antes do envio
     const nomeInput = form.querySelector('input[name="nome"]');
     const enderecoInput = form.querySelector('input[name="endereco"]');
     const emailInput = form.querySelector('input[name="email"]');
