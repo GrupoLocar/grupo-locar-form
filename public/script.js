@@ -2,6 +2,7 @@
 // -----------------------------------------------------------
 // Máscaras, validações, envio com fetch e modal “aguarde”
 // -----------------------------------------------------------
+
 function mascaraTelefone(input) {
   input.value = input.value
     .replace(/\D/g, '')
@@ -20,7 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
     Inputmask({ mask }).mask(el);
   });
 
-  // Atualiza nome do arquivo
+  // Atualiza nome do arquivo nos inputs de file
   document.querySelectorAll('input[type="file"]').forEach(input => {
     input.addEventListener('change', function () {
       const span = this.closest('.file-upload')?.querySelector('.file-name');
@@ -49,21 +50,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
     input.addEventListener('input', () => {
       input.value = input.value
+        // remove acentos e ç
+        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+        // tudo em minúsculo
         .toLowerCase()
-        // reduz múltiplos espaços a um só, sem remover espaços válidos
+        // reduz múltiplos espaços a um só
         .replace(/\s{2,}/g, ' ')
-        // só capitaliza letra que vier no início ou após espaço
-        .replace(/(^|\s)(\p{L})/gu, (match, sep, char) => sep + char.toUpperCase());
+        // só maiúscula após início ou espaço
+        .replace(/(^|\s)([a-z])/g, (m, sep, ch) => sep + ch.toUpperCase());
     });
   });
 
   // Funções de normalização para envio
   function formatarNomeEndereco(valor) {
     return valor
+      .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
       .toLowerCase()
       .replace(/\s+/g, ' ')
       .trim()
-      .replace(/(^|\s)(\p{L})/gu, (m, sep, c) => sep + c.toUpperCase());
+      .replace(/(^|\s)([a-z])/g, (m, sep, ch) => sep + ch.toUpperCase());
   }
 
   function validarEmail(valor) {
@@ -116,11 +121,11 @@ document.addEventListener('DOMContentLoaded', () => {
         ['nada_consta', 'comprovante_mei', 'observacao'].includes(n)
       ) return;
 
-      // <select> que ainda esteja em "Selecione"
+      // Seletores não preenchidos
       if (el.tagName === 'SELECT' && (!el.value || el.value === 'Selecione')) {
         invalidos.push(el);
-      }
-      // campos não-file sem valor
+      } 
+      // Outros inputs sem valor
       else if (el.type !== 'file' && !el.value.trim()) {
         invalidos.push(el);
       }
