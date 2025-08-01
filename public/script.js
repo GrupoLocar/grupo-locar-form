@@ -30,15 +30,28 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Formatação dinâmica de todos os campos de texto 
-  // (exceto 'filhos', 'email' e 'pix')
+  // Formatação dinâmica de todos os campos de texto
+  // (exceto campos que devem aceitar apenas números ou devem ficar em minúsculo)
   document.querySelectorAll('input[type="text"]').forEach(input => {
     const name = input.name;
-    if (name === 'filhos' || name === 'email' || name === 'pix') return;
+    const skip = [
+      'filhos',
+      'email',
+      'pix',
+      'cnh',
+      'telefone',
+      'cep',
+      'cpf',
+      'rg',
+      'contato_familiar'
+    ];
+    if (skip.includes(name)) return;
+
     input.addEventListener('input', () => {
       input.value = input.value
         .toLowerCase()
-        .replace(/\s{2,}/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim()
         .replace(/\b\w/g, l => l.toUpperCase());
     });
   });
